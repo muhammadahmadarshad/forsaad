@@ -6,11 +6,6 @@ function MonthlySalary() {
   return (
     <div>
       <SalarySlip />
-      <Col md={24} lg={24} sm={24} xs={24} span={24}>
-        <Form.Item>
-      
-        </Form.Item>
-      </Col>
     </div>
   );
 }

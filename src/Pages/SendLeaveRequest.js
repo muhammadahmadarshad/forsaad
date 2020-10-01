@@ -1,6 +1,8 @@
-import React,{useState} from "react";
+import React,{useEffect, useState} from "react";
 import {Form,Input,DatePicker,Button,Row,Col, Divider, Select} from 'antd'
 import LeaveService from "../Services/LeaveService";
+import LastLeaveRequest from "../components/LastLeaveRequest";
+import Loading from "./Loading";
 const layout = {
   labelCol: {
     span: 6,
@@ -12,14 +14,50 @@ const layout = {
 
 
 function SendLeaveRequest(props) {
-
+  const [loadingData,setLoadingData]=useState(true)
+  const [data,setData]= useState([])
   const [loading,setLoading]=useState(false)
-  const [error,setError]=useState(false)
-  function onFinish(data){
-    console.log(data)
+
+  const deleteRow=(oldData) =>
+  new Promise((resolve) => {
+    LeaveService.deleteLeave(oldData._id)
+    .then(res=>{
+        const data1 = [...data];
+        data1.splice(data.indexOf(oldData), 1);
+        setData(data1)
+      resolve()
+    }).
+    catch((err)=>{
+      console.log(err.response)
+      alert('You Are Not Allowed to Delete.')
+      resolve()
+    })
+
+  })
+
+  useEffect(()=>{
+
+
+    LeaveService.getMyleavesRequest()
+    .then(res=>{
+      setData(res.data)
+      setLoadingData(false)
+    })
+    .catch(err=>{
+      setLoadingData(false)
+    })
+
+  },[])
+
+
+  function onFinish(values){
     setLoading(true)
-    LeaveService.applyleave(data)
+    LeaveService.applyleave(values)
     .then((res)=>{
+      console.log(res)
+      let leaves=[...data]
+      leaves.unshift(res.data)
+      setData(leaves)
       setLoading(false)
       alert('Successfully Applied for Leave.')
     })
@@ -30,10 +68,13 @@ function SendLeaveRequest(props) {
     })
   }
 
+  if(loadingData){
+      return <Loading/>
+  }
   return (
-    <div>
+    <div className='p-5'>
 
-      <div className='w-75' >
+      <div>
         <h4>Leave Request Form</h4>
         <Divider/>
       <Form {...layout} name="nest-messages" onFinish={onFinish} validateMessages={ 
@@ -109,6 +150,8 @@ function SendLeaveRequest(props) {
       </Row>
     </Form>
       </div>
+
+      <LastLeaveRequest DeleteData={deleteRow} data={data}/>
     </div>
   );
 }

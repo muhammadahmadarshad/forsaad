@@ -2,16 +2,45 @@ import React,{useState} from 'react'
 import { Card } from "antd";
 import { Row, Col, Divider } from "antd";
 import { Form, Input, Button, Select } from "antd";
+import moment from 'moment'
+import LeaveService from '../Services/LeaveService';
 const { Option } = Select;
-export default function PendingLeaveByUser() {
-    const [userName, setUserName] = useState("Saad");
+export default function PendingLeaveByUser({leave,getLeaves}) {
 
-    const onFinish = (values) => {
-      console.log(values);
-    };
+  const [verify,setVerify]=useState(false)
+  let [form]=Form.useForm()
+  let {userId,approvalStatus,
+    fromDate,
+    leaveType,
+    numberOfDays,
+    reasonOfLeave,
+    remainingLeaves,
+    requestDate,
+    toDate,
+    totalLeaves,
+  }= leave
+  requestDate=moment(requestDate)
+  toDate= moment(toDate)
+  fromDate=moment(fromDate)
+
+  form.setFieldsValue({approvalStatus})
+  const onFinish=(values)=>{
+    setVerify(true)
+   LeaveService.verifyleave(leave._id,values)
+   .then(()=>{
+    alert("Leave has been verified.")
+    setVerify(false)
+    getLeaves()
+   })
+   .catch((err)=>{
+    setVerify(false)
+    alert("Request Failed")
+   })
+
+  }
     return (
         <div>
-                  <Card title={"Pending Leave from " + userName}>
+      <Card title={`Pending Leave from ${userId.empId} ${userId.firstName} ${userId.lastName}`}>
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
           <Col className="gutter-row" xs={{ span: 12 }} lg={{ span: 6 }}>
             <div style={{ marginTop: "8%" }}>
@@ -23,23 +52,19 @@ export default function PendingLeaveByUser() {
             <div style={{ marginTop: "8%" }}>
               <strong>total days : </strong>
             </div>
-            <div style={{ marginTop: "8%" }}>
-              <strong>Department Name : </strong>
-            </div>
+
           </Col>
           <Col xs={{ span: 12 }} lg={{ span: 6 }}>
             <div style={{ marginTop: "8%" }}>
-              <p>14-OCT-2020</p>
+              <p>{requestDate.calendar()}</p>
             </div>
             <div style={{ marginTop: "8%" }}>
-              <p>12-OCT-2020</p>
+            <p>{fromDate.format("dddd, MMMM Do YYYY")}</p>
             </div>
             <div style={{ marginTop: "8%" }}>
-              <p>1 </p>
+              <p>{numberOfDays} </p>
             </div>
-            <div style={{ marginTop: "8%" }}>
-              <p>Customer Sales Executive </p>
-            </div>
+
           </Col>
 
           <Col className="gutter-row" xs={{ span: 12 }} lg={{ span: 6 }}>
@@ -58,29 +83,28 @@ export default function PendingLeaveByUser() {
           </Col>
           <Col className="gutter-row" xs={{ span: 12 }} lg={{ span: 6 }}>
             <div style={{ marginTop: "8%" }}>
-              <p>Waqar Hassan</p>
+            <p>{`${userId.empId} ${userId.firstName} ${userId.lastName}`}</p>
             </div>
             <div style={{ marginTop: "8%" }}>
-              <p>28-OCT-2020</p>
+            <p>{fromDate.format("dddd, MMMM Do YYYY")}</p>
             </div>
             <div style={{ marginTop: "8%" }}>
-              <p>Casual Leave 5/5</p>
+              <p>{`${leaveType} ${remainingLeaves}/${totalLeaves}`}</p>
             </div>
             <div style={{ marginTop: "8%" }}>
               <p>
                 {" "}
-                I am requesting a Leave for One day on 28th of October Due to
-                Some Import i want leave due to illness{" "}
+                {reasonOfLeave}{" "}
               </p>
             </div>
           </Col>
         </Row>
         <Divider></Divider>
-        <Form name="control-ref" onFinish={onFinish}>
+        <Form form={form} name="control-ref" onFinish={onFinish}>
           <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
             <Col className="gutter-row" xs={{ span: 24 }} lg={{ span: 12 }}>
               <Form.Item
-                name="Remarks"
+                name="remarks"
                 label="Remarks"
                 rules={[
                   {
@@ -93,7 +117,7 @@ export default function PendingLeaveByUser() {
             </Col>
             <Col className="gutter-row" xs={{ span: 24 }} lg={{ span: 12 }}>
               <Form.Item
-                name="Action"
+                name="approvalStatus"
                 label="Action"
                 rules={[
                   {
@@ -102,13 +126,14 @@ export default function PendingLeaveByUser() {
                 ]}
               >
                 <Select placeholder="Select Any option">
-                  <Option value="male">Pending</Option>
-                  <Option value="female">Approved</Option>
-                  <Option value="other">Rejected</Option>
+                  <Option value="pending">Pending</Option>
+                  <Option value="approved">Approved</Option>
+                  <Option value="rejected">Rejected</Option>
                 </Select>
               </Form.Item>
               <Form.Item>
                 <Button
+                  disabled={verify}
                   type="primary"
                   htmlType="submit"
                   style={{ marginLeft: "85%" }}

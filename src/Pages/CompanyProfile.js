@@ -50,9 +50,10 @@ function CompanyProfile() {
     loading: false,
     imageUrl: "",
   });
+  const [updating,setUpdating]=useState(false)
 
   const [form]=Form.useForm()
-  const [data,setData]=useState(false)
+  const [data,setData]=useState([])
 
   const [loading,setLoading]=useState(true)
 
@@ -65,6 +66,7 @@ function CompanyProfile() {
         email,
         phoneNumber
       }=res.data[0]
+      setData(res.data)
       form.setFieldsValue({
         companyName,
         websiteURL,
@@ -78,13 +80,16 @@ function CompanyProfile() {
   },[])
 
   const onFinish = (values) => {
-    if(data){
-      CompanyProfileService.editCompanyProfile(data._id,values)
+    setUpdating(true)
+    if(data.length>0){
+      CompanyProfileService.editCompanyProfile(data[0]._id,values)
       .then(res=>{
         console.log(res)
+        alert("Successfully Updated..")
+        setUpdating(false)
       })
-      .catch(()=>{
-
+      .catch((err)=>{
+        console.log(err.response)
 
       })
 
@@ -248,7 +253,7 @@ function CompanyProfile() {
         </Col>  */}
         </Row>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit">
+          <Button disabled={updating} type="primary" htmlType="submit">
             Submit
           </Button>
         </Form.Item>

@@ -22,7 +22,7 @@ export default function Sidebar(props) {
     return (
      
 
-        <Menu  style={{height:'inherit',width:'inherit'}}
+        <Menu  
           defaultSelectedKeys={['1']}
           defaultOpenKeys={['nav1']}
           mode="inline"

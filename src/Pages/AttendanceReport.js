@@ -1,92 +1,97 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Button } from "antd";
 import { Row, Col, Divider } from "antd";
 import EmployeeTable from "../components/EmployeeTable.jsx";
 import { DatePicker } from "antd";
 import { Select } from "antd";
-import { NavLink } from "react-router-dom";
-
+import UserService from '../Services/UserService'
+import Loading from '../Pages/Loading'
+import AttendanceService from '../Services/AttendanceService'
+import moment from 'moment'
 const { Option } = Select;
+
 function AttendanceReport() {
+  const [employs,setEmploys]=useState([])
+  const [loading,setLoading]=useState(true)
+  const [err,setErr]=useState(false)
+  const [loadingData,setLoadingData]=useState(false)
   const [state, setState] = useState({
     columns: [
       {
         title: "Sr.",
         render: (rowData) => rowData.tableData.id + 1,
       },
-      { title: "Employee ID", field: "empID" },
-      { title: "Employee Name", field: "empName" },
+      { title: "Employee ID", render:(row)=>row.userId.empId },
+      { title: "Employee Name", field: "empName", render:(row)=>`${row.userId.firstName} ${row.userId.lastName}`},
 
       {
         title: "Check In",
-        field: "checkIn",
+        render:(row)=>moment(row.checkInDate).format("dddd, MMMM Do YYYY, h:mm a"),
       },
-      { title: "Check Out", field: "checkOut" },
-      { title: "Total Time", field: "totalTime" },
-      { title: "Status", field: "status" },
+      { title: "Status", render:(row)=>row.status },
     ],
-    rows: [
-      {
-        empName: "Saad",
-        empID: "30",
-        checkIn: "28",
-        checkOut: "25000",
-        totalTime: "2000",
-        status: "2",
-      },
-      {
-        empName: "Saad",
-        empID: "30",
-        checkIn: "28",
-        checkOut: "25000",
-        totalTime: "2000",
-        status: "2",
-      },
-      {
-        empName: "Saad",
-        empID: "30",
-        checkIn: "28",
-        checkOut: "25000",
-        totalTime: "2000",
-        status: "2",
-      },
-      {
-        empName: "Saad",
-        empID: "30",
-        checkIn: "28",
-        checkOut: "25000",
-        totalTime: "2000",
-        status: "2",
-      },
-    ],
+    rows: [],
   });
 
-  function onChange(value) {
-    console.log(`selected ${value}`);
-  }
+  useEffect(()=>{
 
-  function onBlur() {
-    console.log("blur");
-  }
+      UserService.getAllUsers()
+      .then(res=>{
+        setEmploys(res.data)
+        setLoading(false)
+      })
+      .catch(err=>{
 
-  function onFocus() {
-    console.log("focus");
-  }
-  function onChangedate(date, dateString) {
-    console.log(dateString);
-  }
-  function onSearch(val) {
-    console.log("search:", val);
-  }
+        setErr(true)
+        setLoading(false)
+      })
+
+
+
+  },[])
 
   const onFinish = (values) => {
-    console.log("Success:", values);
-    console.log(values["date"]._d);
+    setLoadingData(true)
+    let {empID,fromDate,toDate}=values
+    if(!empID){
+
+      fromDate=moment(fromDate).toISOString()
+      toDate=moment(toDate).toISOString()
+      AttendanceService.getAttendanceReportofAllUser({ fromDate,
+      toDate})
+      .then(res=>{
+        console.log(res.data)
+        setState({...state,rows:res.data})
+        setLoadingData(false)
+      })
+      .catch(err=>{
+        console.log(err.response)
+        alert("Error Occured..")
+        setLoadingData(false)
+      })
+
+    }
+
+    else{
+
+      fromDate=moment(fromDate).toISOString()
+      toDate=moment(toDate).toISOString()
+      AttendanceService.getAttendanceReportOfUser({ empID,fromDate,
+      toDate})
+      .then(res=>{
+        setState({...state,rows:res.data})
+        setLoadingData(false)
+      })
+      .catch(err=>{
+        alert("Error Occured..")
+        console.log(err.response)
+        setLoadingData(false)
+      })
+
+    }
+
   };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
   const layout = {
     labelCol: {
       span: 12,
@@ -101,6 +106,17 @@ function AttendanceReport() {
       span: 12,
     },
   };
+
+  if(loading){
+
+    return <Loading/>
+  }
+
+  else if(err) {
+
+    return <h5 className='text-center text-danger'>Request Failed</h5>
+  }
+
   return (
     <div>
       <Divider orientation="left">Search</Divider>
@@ -112,31 +128,35 @@ function AttendanceReport() {
           remember: true,
         }}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+    
       >
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 18 }}>
           <Col className="gutter-row" xs={{ span: 24 }} lg={{ span: 8 }}>
             <Form.Item label="EmployeeName" name="empID">
               <Select
-                showSearch
                 placeholder="Select Employee"
-                onSearch={onSearch}
-                onChange={onchange}
               >
-                <Option value="jack">Jack</Option>
-                <Option value="lucy">Lucy</Option>
-                <Option value="tom">Tom</Option>
+               {employs.map(emp=><Option value={emp._id} key={emp._id}>{`${emp.empId} ${emp.firstName} ${emp.lastName}`}</Option>)}
+              
               </Select>
             </Form.Item>
           </Col>
           <Col className="gutter-row" xs={{ span: 24 }} lg={{ span: 8 }}>
-            <Form.Item label=" Date from" name="dateFrom">
-              <DatePicker onChange={onChangedate} />
+            <Form.Item label=" Date from" name="fromData" 
+            rules={[{
+              required:true,
+              message:'From Date Should Not Be Empty'
+              }]}>
+              <DatePicker  />
             </Form.Item>
           </Col>
           <Col className="gutter-row" xs={{ span: 24 }} lg={{ span: 8 }}>
-            <Form.Item label=" Date to" name="dateTo">
-              <DatePicker onChange={onChangedate} />
+            <Form.Item label=" Date to" name="fromDate"
+                          rules={[{
+                            required:true,
+                            message:'To Date Should Not Be Empty'
+                            }]}>
+              <DatePicker  />
             </Form.Item>
           </Col>
           <Col className="gutter-row" xs={{ span: 24 }} lg={{ span: 8 }}>
@@ -148,7 +168,11 @@ function AttendanceReport() {
           </Col>
         </Row>
       </Form>
-      <EmployeeTable data={state} title="Attendance Report "></EmployeeTable>
+
+      {state.rows.length>0&&!loadingData?<EmployeeTable data={state} title="Attendance Report "></EmployeeTable>:<div>
+        
+        {loadingData?<Loading/>:<h5 className='text-danger text-center'>No Report Found</h5>}
+      </div>}
     </div>
   );
 }

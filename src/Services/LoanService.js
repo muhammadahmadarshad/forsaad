@@ -7,6 +7,7 @@ class LoanService extends GenericService {
   verffyLoan = (_id, data) => this.put("/api/loan/" + _id, data);
   getPendingLoans = () => this.get("/api/loan/pending");
   getMyLoansRequest = () => this.get("/api/loan/me");
+  deleteLoanRequest=(id)=> this.delete(`/api/loan/${id}`)
   getLoanReportOfUser=(data)=>{
 
     let {fromDate,toDate,empID}=data

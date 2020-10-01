@@ -20,12 +20,13 @@ import AttendanceSheet from './Pages/Attendance'
 import LoanReport from './Pages/LoanReport'
 import SalaryReport from './Pages/EmployeeSalary'
 import { useParams,Route } from 'react-router';
+import ViewProfile from './Pages/ViewProfile.js';
 
 export default function AdminRoutes(props) {
 
   let {page}=useParams()
       if(page==='EmployeeManagement')
-          return <Route component={EmployeeManagement } to='/admin/EmployeeManagement/:id'/>
+          return <Route component={EmployeeManagement }  to='/admin/EmployeeManagement/:id'/>
       else if (page==='AddNewEmployee'){
           return <Route to='/admin/AddNewEmployee' component={AddNewEmployee} />
       }
@@ -94,6 +95,10 @@ export default function AdminRoutes(props) {
       }
       else if(page==='LoanReport'){
         return <Route to='/admin/SalaryReport' component={SalaryReport} />
+      }
+
+      else if(page==='ViewProfile'){
+        return <Route to='/admin/ViewProfile/:id' component={ViewProfile} />
       }
       else {
         return (<div>

@@ -10,24 +10,13 @@ import Paper from "@material-ui/core/Paper";
 import MessageService from "../Services/MessageService";
 import Loading from "../Pages/Loading";
 import Moment from "moment";
-import ReplyIcon from "@material-ui/icons/Reply";
-import Button from "@material-ui/core/Button";
-import PrivateMessage from "../Pages/PrivateMessage.js";
-const useStyles = makeStyles((theme) => ({
-  margin: {
-    margin: theme.spacing(1),
-  },
-  extendedIcon: {
-    marginRight: theme.spacing(1),
-  },
-}));
 const StyledTableCell = withStyles((theme) => ({
   head: {
     backgroundColor: theme.palette.common.black,
     color: theme.palette.common.white,
   },
   body: {
-    fontSize: 14,
+    //fontSize: 14,
   },
 }))(TableCell);
 
@@ -47,22 +36,16 @@ const StyledTableRow = withStyles((theme) => ({
 //   createData("Gingerbread", 356),
 // ];
 
-export default function Inbox(props) {
-  //console.log(props);
-  function Reply(args) {
-    //props.changeTab(1);
-    props.changetab();
-    console.log(props.changetab);
-  }
+export default function Outbox() {
   let [loading, setLoading] = useState(true);
   let [err, setError] = useState(false);
   let [data, setData] = useState({ rows: [] });
-  const classes = useStyles();
+
   React.useEffect(() => {
-    MessageService.getInbox()
+    MessageService.getOutbox()
       .then((res) => {
         console.log("response");
-        console.log(res.data[0]);
+        console.log(res.data);
         setData({ ...data, rows: res.data });
 
         setLoading(false);
@@ -93,32 +76,27 @@ export default function Inbox(props) {
           </TableHead>
           <TableBody>
             {data.rows.map((row) => (
-              <StyledTableRow key={row.name}>
+              <StyledTableRow key={row.createdAt}>
+                {/* {row.toUserId.map((r) => (
+                  <StyledTableRow key={r.empId}> */}
                 <StyledTableCell component="th" scope="row">
-                  {row.fromUserId.empId}
+                  {row.toUserId.map((r) => (
+                    <p>{r.empId}</p>
+                  ))}
                 </StyledTableCell>
                 <StyledTableCell component="th" scope="row">
-                  {row.fromUserId.firstName}
+                  {row.toUserId.map((r) => (
+                    <p>{r.firstName}</p>
+                  ))}
                 </StyledTableCell>
                 <StyledTableCell component="th" scope="row">
                   {Moment(row.createdAt).calendar()}
                 </StyledTableCell>
                 <StyledTableCell component="th" scope="row">
                   <div dangerouslySetInnerHTML={{ __html: row.message }} />
-                  <Button
-                    variant="contained"
-                    size="small"
-                    color="primary"
-                    className={classes.margin}
-                    onClick={() => {
-                      props.changetab(row.fromUserId._id);
-                      console.log(props.changetab);
-                    }}
-                  >
-                    <ReplyIcon></ReplyIcon>
-                    Reply
-                  </Button>
                 </StyledTableCell>
+                {/* </StyledTableRow>
+                ))} */}
               </StyledTableRow>
             ))}
           </TableBody>

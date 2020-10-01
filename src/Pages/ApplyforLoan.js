@@ -8,28 +8,45 @@ import LoanService from '../Services/LoanService'
 
 export default function ApplyforLoan(props) {
   const onFinish = (values) => {
-    LoanService.applyLoan(values).then(()=>{
+    LoanService.applyLoan(values).then((res)=>{
+      setData([...data,res.data])
       alert("Successfully Submitted")
     }).catch((err)=>{
         alert('Request Failed')
     })
   };
-  const [loading,setLoading]=useState(false)
+
+  const [loading,setLoading]=useState(true)
   const [err,setErr]= useState(false)
   const [data,setData]=useState([])
 
+  const deleteRow=(oldData) =>
+  new Promise((resolve) => {
+    LoanService.deleteLoanRequest(oldData._id)
+    .then(res=>{
+        const data1 = [...data];
+        data1.splice(data.indexOf(oldData), 1);
+        setData(data1)
+      resolve()
+    }).
+    catch((err)=>{
+      console.log(err.response)
+      alert('You Are Not Allowed to Delete.')
+      resolve()
+    })
+
+  })
   useEffect(()=>{
     
     LoanService.getMyLoansRequest()
     .then(res=>{
      
-      setData(res.data)
-      console.log(res)
+      setData(res.data?res.data:[])
+      setErr(false)
       setLoading(false)
     })
-    .catch(error=>{
-
-      console.log(error.response)
+    .catch(()=>{
+      setErr(true)
       setLoading(false)
     })
 
@@ -46,7 +63,7 @@ export default function ApplyforLoan(props) {
   }
   else
   return (
-    <div>
+    <div className='p-5'>
       <Card title={"Loan request Form"}>
         <Form  name="control-ref" onFinish={onFinish}>
           <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
@@ -89,7 +106,7 @@ export default function ApplyforLoan(props) {
           </Row>
         </Form>
       </Card>
-      <LastLoanRequest data={data}></LastLoanRequest>
+      <LastLoanRequest loading={loading} deleteData={deleteRow} err={err} data={data}></LastLoanRequest>
     </div>
   );
 }

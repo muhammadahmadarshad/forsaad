@@ -22,7 +22,7 @@ function EmployeeManagement(props) {
         sort: "asc",
         width: 100,
         render: (rows) => {
-          return <NavLink to={`/admin/ViewProfile/${rows.empId}`}>{rows.empId}</NavLink>;
+          return <NavLink to={`/admin/ViewProfile/${rows._id}`}>{rows.empId}</NavLink>;
         },
       }
       

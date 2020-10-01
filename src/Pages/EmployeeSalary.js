@@ -1,101 +1,65 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Button } from "antd";
 import { Row, Col, Divider } from "antd";
 import EmployeeTable from "../components/EmployeeTable.jsx";
 import { DatePicker } from "antd";
 import { Select } from "antd";
 import { NavLink } from "react-router-dom";
-
+import salaryService from "../Services/Salary.js";
+import Loading from './Loading'
 const { Option } = Select;
 function EmployeeSalary() {
+
+  const [loading,setLoading]=useState(false)
   const [state, setState] = useState({
     columns: [
       {
-        title: "Employee Name",
-        field: "empName",
+        title: "Employee ID",
+        field: "empName",render:(row)=>`${row.empId}`,
       },
-      { title: "Working Days", field: "workindDays" },
+      {
+        title: "Employee Name",
+        field: "empName",render:(row)=>`${row.firstName} ${row.lastName}`,
+      },
+      { title: "Working Days", field: "workingDays",render:({noOfWorkDays})=>noOfWorkDays*4 },
       {
         title: "Worked",
-        field: "worked",
+        field: "daysWorked",
       },
-      { title: "Gross Total", field: "grossTotal" },
+      { title: "Gross Total", field: "basicSalary" },
       { title: "Deduction", field: "deduction" },
       { title: "Extra Day", field: "extraDay" },
-      { title: "Payable", field: "Payable" },
+      { title: "Payable", field: "payAble" },
       {
         title: "Actions",
         render: (rowData) => {
           return (
-            <NavLink to="/SalarySlip">
-              <button class="btn btn-danger">Process</button>
-              <button class="btn btn-primary">View Salary</button>
-            </NavLink>
+            <Button>Process</Button>
           );
         },
       },
     ],
     rows: [
-      {
-        empName: "Saad",
-        workindDays: "30",
-        worked: "28",
-        grossTotal: "25000",
-        deduction: "2000",
-        extraDay: "2",
-        Payable: "23000",
-      },
-      {
-        empName: "Saad",
-        workindDays: "30",
-        worked: "28",
-        grossTotal: "25000",
-        deduction: "2000",
-        extraDay: "2",
-        Payable: "23000",
-      },
-      {
-        empName: "Saad",
-        workindDays: "30",
-        worked: "28",
-        grossTotal: "25000",
-        deduction: "2000",
-        extraDay: "2",
-        Payable: "23000",
-      },
-      {
-        empName: "Saad",
-        workindDays: "30",
-        worked: "28",
-        grossTotal: "25000",
-        deduction: "2000",
-        extraDay: "2",
-        Payable: "23000",
-      },
     ],
   });
 
-  function onChange(value) {
-    console.log(`selected ${value}`);
-  }
 
-  function onBlur() {
-    console.log("blur");
-  }
-
-  function onFocus() {
-    console.log("focus");
-  }
   function onChangedate(date, dateString) {
     console.log(dateString);
   }
-  function onSearch(val) {
-    console.log("search:", val);
-  }
-
   const onFinish = (values) => {
-    console.log("Success:", values);
-    console.log(values["date"]._d);
+    setLoading(true)
+    let {date}=values
+    salaryService.calculateSalary(date.format('YYYY-MM'))
+    .then(res=>{
+      console.log(res.data)
+      setState((prev)=>{
+        
+        return {...state,rows:res.data}})
+        setLoading(false)
+        
+    })
+
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -116,7 +80,7 @@ function EmployeeSalary() {
     },
   };
   return (
-    <div>
+    <div className='p-5'>
       <Divider orientation="left">Process Salary</Divider>
 
       <Form
@@ -129,23 +93,14 @@ function EmployeeSalary() {
       >
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
           <Col className="gutter-row" xs={{ span: 24 }} lg={{ span: 12 }}>
-            <Form.Item label="EmployeeName" name="empName">
-              <Select
-                showSearch
-                placeholder="Select Employee"
-                onSearch={onSearch}
-                onChange={onchange}
-                style={{ width: "50%" }}
-              >
-                <Option value="jack">Jack</Option>
-                <Option value="lucy">Lucy</Option>
-                <Option value="tom">Tom</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col className="gutter-row" xs={{ span: 24 }} lg={{ span: 12 }}>
-            <Form.Item label="Select Date" name="date">
-              <DatePicker onChange={onChangedate} style={{ width: "50%" }} />
+            <Form.Item label="Select Month" name="date"
+              rules={[{
+                required:true,
+                message:'Month Should Not be Empty.'
+              }]}
+            
+            >
+              <DatePicker placeholder='Select Month' onChange={onChangedate}  style={{ width: "80%" }} />
             </Form.Item>
 
             <Form.Item>
@@ -160,7 +115,11 @@ function EmployeeSalary() {
           </Col>
         </Row>
       </Form>
-      <EmployeeTable data={state} title="Employee Salary"></EmployeeTable>
+      {state.rows.length>0?<EmployeeTable data={state} title="Employee Salary"></EmployeeTable>:
+        loading?<Loading/>:<div></div>
+      
+      
+      }
     </div>
   );
 }

@@ -90,7 +90,6 @@ function LoanReport() {
       LoanService.getLoanReportOfUser({ empID,fromDate,
       toDate})
       .then(res=>{
-        console.log(res.data)
         setState({...state,rows:res.data})
         setLoadingData(false)
       })

@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React from "react";
 import { forwardRef } from "react";
 import MaterialTable from "material-table";
 import AddBox from "@material-ui/icons/AddBox";
@@ -41,40 +41,37 @@ const tableIcons = {
   ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
 };
-function LastLoanRequest({data,loading,deleteData}) {
-  
-  let columns= [
-    { title: 'Request Date', field: 'requestDate', render:({requestDate})=> moment(requestDate).calendar() },
+function LastLeaveRequest({data,DeleteData  }) {
+  let columns=[
+    { title: 'From Date', field: 'requestDate', render:({fromDate})=> moment(fromDate).format('DD-MM-YY') },
+    { title: 'To Date', field: 'requestDate', render:({toDate})=> moment(toDate).format('DD-MM-YY') },
     {
-      title: 'Amount',
-      field: 'loanAmount',
+      title: 'Leave Days',
+      field: 'numberOfDays',
+    },
+
+    {
+      title: 'Leave Type',
+      field: 'leaveType',
     },
     {
-      title: 'Status',
-      field: 'finalStatus',
+      title: 'Reason of Leave',
+      field: 'reasonOfLeave',
     },
     {
-      title: 'Reason of Loan',
-      field: 'reasonOfLoan',
-    },
-    {
-      title: 'Remarks',
-      field: 'remarks',
+      title: 'Approval Status',
+      field: 'approvalStatus',
     },
     {
       title: 'Decision Date',
-       render:({decisionDate})=> decisionDate?moment(decisionDate).calendar():'',
+       render:({decisionDate})=>decisionDate? moment(decisionDate).calendar():'N/A',
     },
   ]
-  if(loading){
 
-    return <Loading/>
-  }
-  else
   return (
     <div className='mt-5'>
       <MaterialTable
-        title="Previous Loan Requests"
+        title="Previous Leave Requests"
         options={{
           headerStyle: {
             zIndex: 0,
@@ -85,11 +82,11 @@ function LastLoanRequest({data,loading,deleteData}) {
         data={data}
         editable={{
 
-          onRowDelete: deleteData,
+          onRowDelete: DeleteData,
         }}
       />
     </div>
   );
 }
 
-export default LastLoanRequest;
+export default LastLeaveRequest;

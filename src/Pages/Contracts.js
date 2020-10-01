@@ -75,7 +75,7 @@ function Contracts() {
     ContractService.getContract()
     .then((res)=>{
       console.log(res.data)
-      setState({...state,data:res.data})
+      setState({...state,data:res.data?res.data:[]})
       setLoading(false)
       setErr(false)
     })

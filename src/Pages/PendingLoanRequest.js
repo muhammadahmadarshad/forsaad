@@ -29,7 +29,7 @@ function PendingLoanRequest() {
     <div>
       <h4 className='text-center'><em>Pending Loan Requests</em></h4>
       {data.length>0?
-        data.map((d,index)=><PendingLoanRequestByUser getData={getData} key={index} data={d}/>)
+        data.map((d,index)=><PendingLoanRequestByUser  getData={getData} key={index} data={d}/>)
           :<h5>No Pending Requests Available</h5>}
     </div>
   );

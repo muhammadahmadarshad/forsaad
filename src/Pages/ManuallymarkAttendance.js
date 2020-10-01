@@ -5,7 +5,7 @@ import UserService from '../Services/UserService'
 import { DatePicker } from "antd";
 import { Select } from "antd";
 import Loading from "./Loading";
-
+import attendanceService from "../Services/AttendanceService";
 const { Option } = Select;
 
 
@@ -35,7 +35,14 @@ function ManuallymarkAttendance() {
 
 
   const onFinish = (values) => {
-    console.log("Success:", values);
+    let {empName,status, checkInDate} =values
+    attendanceService.ManuallyMarkAttendance(empName,{status,checkInDate})
+    .then(res=>{  
+      alert('Successfully Marked..')
+    })
+    .catch(err=>{
+      alert("Request Failed.")
+    })
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -82,20 +89,40 @@ function ManuallymarkAttendance() {
       >
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 18 }}>
           <Col className="gutter-row" span={14}>
-            <Form.Item label="EmployeeName" name="empName">
+            <Form.Item label="EmployeeName" name="empName"
+              rules={[{
+                required:true,
+                message:"Employee Must be selected."
+              }]}
+            
+            >
               <Select
-                style={{ width: 200 }}
+                style={{ width: 210 }}
                 placeholder="Select Employee"
               >
-                {employs.map(((emp,key)=><Option key={key} value={emp._id}>{`${emp.firstName} ${emp.lastName}`}</Option>))}
+                {employs.map(((emp,key)=><Option key={key} value={emp._id}>{`${emp.empId}  ${emp.firstName} ${emp.lastName}`}</Option>))}
                 
               </Select>
             </Form.Item>
-            <Form.Item label="Date" name="date">
+            <Form.Item label="Date" name="checkInDate"
+            
+              rules={[{
+                required:true,
+                message:"Date Should Not be Empty."
+              }]}
+            
+            >
               <DatePicker  />
             </Form.Item>
-            <Form.Item label="Action" name="action">
-              <Select defaultValue="Absent">
+            <Form.Item label="Status" name="status"
+            rules={[{
+
+              required:true,
+              message:'Status Should not be Empty..'
+            }]}
+            
+            >
+              <Select placeholder="Select Status">
                 <Option value="absent">Absent</Option>
                 <Option value="present">Present</Option>
               </Select>

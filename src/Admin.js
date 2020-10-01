@@ -8,7 +8,7 @@ import { MenuFoldOutlined,MenuUnfoldOutlined } from "@ant-design/icons";
 import AdminRoutes from "./AdminRoutes";
 import './App.css'
 import { Route, Switch, useRouteMatch } from "react-router";
-import Home from "./Pages/Demo";
+import Dashboard from "./Pages/Dashboard";
 
 const {Header,Sider}=Layout
 function Admin(props) {
@@ -35,7 +35,7 @@ function Admin(props) {
             <Layout >
    
 
-            <Sider theme={'dark'}  breakpoint='sm'  trigger={null}
+            <Sider theme={'dark'} breakpoint='sm'  trigger={null}
                 collapsedWidth={isSmallScreen?0:80}
                 collapsible
                 defaultCollapsed={true}
@@ -47,13 +47,13 @@ function Admin(props) {
                 
                 collapsed={collapsed}>
                 <div className='logo'/>
-                  <Sidebar  path={path} url={url} isSmallScreen={isSmallScreen} toggleCollapsed={toggleCollapsed} setCollapsed={setCollapsed} />
+                  <Sidebar style={{overflowY:'scroll'}}    path={path} url={url} isSmallScreen={isSmallScreen} toggleCollapsed={toggleCollapsed} setCollapsed={setCollapsed} />
               </Sider>
               <Layout>
                 <Layout.Content  className='container-fluid'  >
                 <Switch>
-                  <Route path={path} exact component={Home}></Route>
-                  <Route exact path={`${path}/:page`} component={AdminRoutes}/>
+                  <Route path={path} exact component={Dashboard}></Route>
+                  <Route exact path={`${path}/:page/:id?`} component={AdminRoutes}/>
                 </Switch>
                 </Layout.Content>
                 

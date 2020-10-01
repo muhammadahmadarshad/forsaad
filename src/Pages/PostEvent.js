@@ -62,7 +62,8 @@ function PostEvent() {
 
     PostEventService.getEvents()
     .then((res)=>{
-      setState({...state,data:res.data})
+      console.log('')
+      setState({...state,data:res.data?res.data:[]})
       setLoading(false)
       setErr(false)
     })

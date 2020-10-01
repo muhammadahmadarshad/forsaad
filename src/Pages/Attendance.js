@@ -4,9 +4,11 @@ import { Row, Col, Divider } from "antd";
 import { Table } from "antd";
 import { DatePicker } from "antd";
 import { Card } from "antd";
+import Moment from 'moment'
 import "../Styles/home.css";
+import EmployeeTable from "../components/EmployeeTable";
+import AttendanceService from '../Services/AttendanceService'
 function Attendance() {
-  var daa = new Date();
 
   const dataSource = [
     {
@@ -268,7 +270,7 @@ function Attendance() {
       key: "address",
     },
     {
-      title: "CL",
+      title: "A",
       dataIndex: "CL",
       key: "address",
     },
@@ -279,40 +281,35 @@ function Attendance() {
     },
   ];
   const [date, setDate] = useState(
-    daa.getFullYear() + "-" + (daa.getMonth() + 1)
+    Moment()
   );
   function onChange(value) {
     console.log(`selected ${value}`);
   }
 
-  function onBlur() {
-    console.log("blur");
+  function onChangedate(date) {
+    setDate(date)
   }
 
-  function onFocus() {
-    console.log("focus");
-  }
-  function onChangedate(date, dateString) {
-    console.log(dateString);
-  }
-  function onSearch(val) {
-    console.log("search:", val);
-  }
 
   const onFinish = (values) => {
-    console.log("Success:", values);
-    // console.log(values["dateFrom"]._d.getMonth() + 1);
-    // console.log(values["dateFrom"]._d.getFullYear());
-    // var str =
-    //   values["dateFrom"]._d.getFullYear() +
-    //   "-" +
-    //   values["dateFrom"]._d.getMonth() +
-    //   1;
+    let {toDate}=values
+    
+    let fromDate=Moment(toDate.toISOString())
+     toDate   = Moment(toDate).endOf('month')
+    fromDate.set('hours',0)
+    fromDate.set('minutes',0)
+    fromDate.set('seconds',0)
+    
+    fromDate=fromDate.toISOString()
+    toDate= toDate.toISOString()
+    AttendanceService.getAttendanceReportofAllUser({fromDate,toDate})
+    .then(res=>{
+      let status=[]
+
+    })
   };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
   const layout = {
     labelCol: {
       span: 12,
@@ -328,7 +325,7 @@ function Attendance() {
     },
   };
   return (
-    <div>
+    <div className='p-5'>
       <Divider orientation="left">Search</Divider>
       <Form
         name="basic"
@@ -336,11 +333,10 @@ function Attendance() {
           remember: true,
         }}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
       >
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 18 }}>
           <Col className="gutter-row" xs={{ span: 24 }} lg={{ span: 6 }}>
-            <Form.Item label=" Select Date" name="dateFrom">
+            <Form.Item label=" Select Month" name="toDate">
               <DatePicker onChange={onChangedate} picker="month" />
             </Form.Item>
           </Col>
@@ -354,7 +350,7 @@ function Attendance() {
           </Col>
         </Row>
       </Form>
-      <Divider>Attendance Sheet of month : {date} </Divider>
+      <Divider>Attendance Sheet of month : {date?date.format('MMMM-YYYY'):"Select Month"} </Divider>
 
       <Card>
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 18 }}>
@@ -385,13 +381,7 @@ function Attendance() {
           </Col>
         </Row>
       </Card>
-      <Table
-        className="table-striped-rows"
-        dataSource={dataSource}
-        columns={columns}
-        scroll={{ x: "max-content" }}
-        bordered={true}
-      />
+        <EmployeeTable data={{columns}}/>
     </div>
   );
 }
