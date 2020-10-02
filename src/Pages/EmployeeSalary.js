@@ -3,14 +3,37 @@ import { Form, Button } from "antd";
 import { Row, Col, Divider } from "antd";
 import EmployeeTable from "../components/EmployeeTable.jsx";
 import { DatePicker } from "antd";
-import { Select } from "antd";
-import { NavLink } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import salaryService from "../Services/Salary.js";
 import Loading from './Loading'
-const { Option } = Select;
-function EmployeeSalary() {
+import moment from 'moment'
+import {useAuth} from '../Context/auth'
+function EmployeeSalary(props) {
+  const [err,setErr]=useState(false)
+  const [form]=Form.useForm()
+  const redux=useAuth()
+  let {id}=useParams()
 
-  const [loading,setLoading]=useState(false)
+  form.setFieldsValue({date:moment(id)})
+  useEffect(()=>{
+    if(id){
+    salaryService.calculateSalary(id)
+    .then(res=>{
+      console.log(res.data)
+      setState((prev)=>{        
+        return {...prev,rows:res.data}})
+        setErr(false)
+        setLoading(false)
+        
+    }).catch(err=>{
+      setErr(true)
+      setLoading(false)
+    })}
+    else 
+      setLoading(false)
+
+  },[id])
+  const [loading,setLoading]=useState(true)
   const [state, setState] = useState({
     columns: [
       {
@@ -34,7 +57,11 @@ function EmployeeSalary() {
         title: "Actions",
         render: (rowData) => {
           return (
-            <Button>Process</Button>
+            <Button color='success' onClick={()=>{
+                console.log(rowData)
+                redux.dispatch({type:'ProcessSalary',payload:{...rowData,salaryMonth:moment(id)}})
+                props.history.push(`/admin/ProcessSalary`)
+            }} >Process</Button>
           );
         },
       },
@@ -50,15 +77,7 @@ function EmployeeSalary() {
   const onFinish = (values) => {
     setLoading(true)
     let {date}=values
-    salaryService.calculateSalary(date.format('YYYY-MM'))
-    .then(res=>{
-      console.log(res.data)
-      setState((prev)=>{
-        
-        return {...state,rows:res.data}})
-        setLoading(false)
-        
-    })
+    props.history.push(`/admin/EmployeeSalary/${date.format('YYYY-MM')}`)
 
   };
 
@@ -79,11 +98,14 @@ function EmployeeSalary() {
       span: 12,
     },
   };
+
+  
   return (
     <div className='p-5'>
       <Divider orientation="left">Process Salary</Divider>
 
       <Form
+      form={form}
         name="basic"
         initialValues={{
           remember: true,
@@ -116,7 +138,7 @@ function EmployeeSalary() {
         </Row>
       </Form>
       {state.rows.length>0?<EmployeeTable data={state} title="Employee Salary"></EmployeeTable>:
-        loading?<Loading/>:<div></div>
+        loading?<Loading/>:<div>{err?<h5 className='text-center text-danger'>Not Found</h5>:""}</div>
       
       
       }

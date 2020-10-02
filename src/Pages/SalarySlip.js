@@ -2,12 +2,89 @@ import React, { useState } from "react";
 import { Card } from "antd";
 import { Row, Col, Divider } from "antd";
 import { Input } from "antd";
-function SalarySlip() {
-  const [userName, setUserName] = useState("Saad");
-  const [Month, setMonth] = useState("Jan-2019");
+import {useAuth} from '../Context/auth'
+import salaryService from "../Services/Salary";
+function SalarySlip(props) {
+
+  let [data,setData]=useState({otherDeduction:'0',otherAllowances:"0",reasonOfOtherAllowances:"",reasonOfOtherDeductions:""})
+  let {state}=useAuth()
+
+  let onChangeData=({target})=>{
+
+      setData((prev)=>{
+
+        return {...prev,[target.name]:target.value}
+      })
+  }
+  
+  if(!state.salaryData){
+
+    props.history.goBack()
+
+    return <div></div>
+  }
+
+
+  let {basicSalary,_id,
+    contract,
+    daysWorked,
+    deduction,
+    department,
+    email,
+    empId,
+    employeeRole,
+    employeeStatus,
+    extraDay,
+    firstName,
+    gender,
+    houseRent,
+    idCardNumber,
+    isAdmin,
+    joiningDate,
+    landlineNumber,
+    lastName,
+    mailingAddress,
+    maritalStatus,
+    medicalAllowance,
+    mobileNumber,
+    noOfWorkDays,
+    payAble,
+    permanentAddress,
+    providentFund,
+    salaryMonth,
+    travelAllowance,}=state.salaryData
+
+
+    let onSubmit=()=>{
+      let {otherAllowances,otherDeduction,reasonOfOtherAllowances,reasonOfOtherDeductions}=data
+      let processData={basicSalary,
+      houseRent,
+      medicalAllowance,
+      providentFund,
+      travelAllowance,
+      extraDays:extraDay,
+      netPayable:payAble,
+      date:salaryMonth.format('YYYY-MM'),
+      daysWorked,userId:_id,
+      deduction,"otherAllowances":otherAllowances,otherDeductions:otherDeduction,
+      reasonOfOtherAllowances:!reasonOfOtherAllowances?"N/A":reasonOfOtherAllowances
+      
+      
+      
+      ,reasonOfOtherDeductions:!reasonOfOtherDeductions?"N/A":reasonOfOtherDeductions}
+      salaryService.processSalary(processData)
+      .then(res=>{
+
+        props.history.push(`/admin/EmployeeSalary${salaryMonth.format('YYYY-MM')}`)
+      })
+      .catch(err=>{
+        console.log(err.response)
+      })
+
+    }
   return (
-    <div>
-      <Card title={"Salary Month Of  " + Month}>
+    <div className='p-5'>
+      <Card title={"Salary Month Of  " + salaryMonth.format('MMMM-YYYY')}>
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
           <Col className="gutter-row" xs={{ span: 11 }} lg={{ span: 6 }}>
             <div style={{ marginTop: "8%" }}>
@@ -21,16 +98,13 @@ function SalarySlip() {
             </div>
           </Col>
           <Col className="gutter-row" xs={{ span: 13 }} lg={{ span: 6 }}>
-            <div style={{ marginTop: "8%" }}>Emp-052</div>
-            <div style={{ marginTop: "8%" }}>Customer Sales Executive</div>
-            <div style={{ marginTop: "8%" }}>12</div>
+          <div style={{ marginTop: "8%" }}>{empId}</div>
+          <div style={{ marginTop: "8%" }}>{department.name}</div>
+          <div style={{ marginTop: "8%" }}>{noOfWorkDays}</div>
           </Col>
           <Col className="gutter-row" xs={{ span: 11 }} lg={{ span: 6 }}>
             <div style={{ marginTop: "8%" }}>
               <strong>Full Name </strong>
-            </div>
-            <div style={{ marginTop: "8%" }}>
-              <strong>Pay Date </strong>
             </div>
             <div style={{ marginTop: "8%" }}>
               <strong>Total Days Worked </strong>
@@ -38,13 +112,10 @@ function SalarySlip() {
           </Col>
           <Col className="gutter-row" xs={{ span: 1 }} lg={{ span: 6 }}>
             <div style={{ marginTop: "8%" }}>
-              <p>Waqar Hassan</p>
+            <p>{`${firstName} ${lastName}`}</p>
             </div>
             <div style={{ marginTop: "8%" }}>
-              <p>28-OCT-2020</p>
-            </div>
-            <div style={{ marginTop: "8%" }}>
-              <p>18</p>
+            <p>{daysWorked}</p>
             </div>
           </Col>
         </Row>
@@ -80,18 +151,19 @@ function SalarySlip() {
                   <div style={{ float: "right" }} className="earnings-cnt">
                     <strong>Amount</strong>
                     <Divider></Divider>
-                    <p>30,000</p>
+                    <p>{basicSalary}</p>
                     <Divider></Divider>
-                    <p>0.00</p>
+                    <p>{houseRent}</p>
                     <Divider></Divider>
-                    <p>0.00</p>
+                    <p>{travelAllowance}</p>
                     <Divider></Divider>
-                    <p>0.00</p>
+                    <p>{medicalAllowance}</p>
                     <Divider></Divider>
-                    <p>0.00</p>
+                    <p>{extraDay}</p>
                     <Divider></Divider>
                   </div>
-                  <Input></Input>
+                  <Input type='number' name={'otherAllowances'} onChange={onChangeData} value={data.otherAllowances}></Input>
+                  <Input required type='text' name={'reasonOfOtherAllowances'} onChange={onChangeData} value={data.reasonOfOtherAllowances}></Input>
                 </Col>
               </Row>
             </Card>
@@ -110,34 +182,33 @@ function SalarySlip() {
                     <strong>Descriptions</strong>
                     <Divider></Divider>
                     <p>Provident Fund</p>
-                    <Divider></Divider>
-                    <p>Salary Deductions</p>
-                    <Divider></Divider>
-                    <p>Tax Deductions</p>
+  
                     <Divider></Divider>
                     <p style={{ height: "23px" }}></p>
                     <Divider></Divider>
                     <p style={{ height: "23px" }}></p>
                     <Divider></Divider>
-                    <p>Other Deductions</p>
+                    <p></p>
+
+                    <Divider></Divider>
+                    <p>Other Deduction</p>
                   </div>
                 </Col>
                 <Col className="gutter-row" span={12}>
                   <div style={{ float: "right" }} className="earnings-cnt">
                     <strong>Amount</strong>
                     <Divider></Divider>
-                    <p>30,000</p>
+                    <p>{providentFund}</p>
                     <Divider></Divider>
-                    <p>0.00</p>
-                    <Divider></Divider>
-                    <p>0.00</p>
+                    <p></p>
                     <Divider></Divider>
                     <p style={{ height: "23px" }}></p>
                     <Divider></Divider>
                     <p style={{ height: "23px" }}></p>
                     <Divider></Divider>
                   </div>
-                  <Input></Input>
+                  <Input type='number' name='otherDeduction' onChange={onChangeData} value={data.otherDeduction}></Input>
+                  <Input type='text' name={'reasonOfOtherDeductions'} onChange={onChangeData} value={data.reasonOfOtherDeductions}></Input>
                 </Col>
               </Row>
             </Card>
@@ -154,7 +225,7 @@ function SalarySlip() {
                 </Col>
                 <Col className="gutter-row" span={12}>
                   {" "}
-                  <strong style={{ float: "right" }}>30000</strong>
+              <strong style={{ float: "right" }}>{payAble+parseInt(data.otherAllowances)}</strong>
                 </Col>
               </Row>
             </Card>
@@ -167,7 +238,7 @@ function SalarySlip() {
                 </Col>
                 <Col className="gutter-row" span={12}>
                   {" "}
-                  <strong style={{ float: "right" }}>6521.74</strong>
+                <strong style={{ float: "right" }}>{deduction+parseInt(data.otherDeduction)}</strong>
                 </Col>
               </Row>
             </Card>
@@ -176,15 +247,9 @@ function SalarySlip() {
 
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
           <Col className="gutter-row" xs={{ span: 24 }} lg={{ span: 12 }}>
-            <Card>
-              <strong>NET PAYABLE : 23577.26</strong>
-            </Card>
-          </Col>
-
-          <Col className="gutter-row" xs={{ span: 24 }} lg={{ span: 12 }}>
-            <a name="" id="" class="btn btn-primary" href="#" role="button">
+            <button onClick={onSubmit} className="btn btn-primary" role="button">
               Pay Now
-            </a>
+            </button>
           </Col>
         </Row>
       </Card>

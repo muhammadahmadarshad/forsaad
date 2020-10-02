@@ -53,7 +53,7 @@ function Dashboard() {
       
     })
     .catch(err=>{
-
+      setLoading(false)
       console.log(err.response)
     })
     

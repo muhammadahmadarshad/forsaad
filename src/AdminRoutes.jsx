@@ -21,6 +21,7 @@ import LoanReport from './Pages/LoanReport'
 import SalaryReport from './Pages/EmployeeSalary'
 import { useParams,Route } from 'react-router';
 import ViewProfile from './Pages/ViewProfile.js';
+import SalarySlip from './Pages/SalarySlip.js';
 
 export default function AdminRoutes(props) {
 
@@ -79,6 +80,9 @@ export default function AdminRoutes(props) {
 
       else if(page==='EmployeeSalary'){
         return <Route to='/admin/EmployeeSalary' component={EmployeeSalary} />
+      }
+      else if(page==='ProcessSalary'){
+        return <Route to='/admin/EmployeeSalary' component={SalarySlip} />
       }
 
       else if(page==='LeaveReport'){
