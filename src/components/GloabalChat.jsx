@@ -56,7 +56,7 @@ export default function GloabalChat({isOpen,handleChatOpen}) {
 
     let onSubmit=(e)=>{
         e.preventDefault()
-
+        if(input!==''){
         let {empId,
             firstName,
             lastName,_id}=state.token
@@ -64,7 +64,8 @@ export default function GloabalChat({isOpen,handleChatOpen}) {
             socket.emit('input',{empId,firstName,lastName,id:_id,message:input})
 
             setMsg([...msgs,{user:{firstName,lastName,empId,id:_id},message:input}])
-            setInput('')      
+            setInput('')
+        }      
     }
 
 
@@ -73,22 +74,22 @@ export default function GloabalChat({isOpen,handleChatOpen}) {
         <div className="chatModule">
             <div className="chatContainer flex-c">
           <ul id="chat" style={{display:isOpen?"":'none'}} className="chatBox flex-c">
-            {msgs.map (msg => {
+            {msgs.map ((msg,index) => {
                 let {user} = msg
                 if(!user){
-                return <li className='sender'>
+                return <li key={index} className='sender'>
                         <p>{msg.message}</p>
                 </li>}
                 else if (user.empId===state.token.empId){
 
-                    return <li className='sender'>
+                    return <li key={index} className='sender'>
                     <       p>{msg.message}</p>
                         </li>
                 }
 
                 else {
 
-                    return <li class="reciever">
+                    return <li key={index} className="reciever">
                                 <p>
                                     <b style={{color: 'red'}}>{`${user.empId} ${user.firstName} ${user.lastName}`}</b><br/>
                                         {msg.message}
