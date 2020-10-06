@@ -7,14 +7,15 @@ import {useAuth} from '../Context/auth'
 function Login(props) {
   const [loginIn,setLoginIn]=useState(false)  
   const [err,setErr]=useState({err:false,msg:""})
-  let {dispatch}=useAuth()
-
+  let {dispatch,state}=useAuth()
+  console.log(state)
   const onFinish = (values) => {
     setLoginIn(true)
      User.login(values)
       .then(res=>{
         setLoginIn(false)
-        dispatch({action:'LOGIN',payload:res.data})
+        dispatch({type:'LOGIN',payload:res.data})
+        console.log(dispatch)
         let {isAdmin}= res.data
         isAdmin?props.history.push('/admin'):props.history.push('/employee')
         setErr({err:false,msg:""})

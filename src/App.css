@@ -9,3 +9,7 @@ body{
   #root > div > section > section > aside{
 
 }}
+.logo {
+  float: left;
+  margin-top: 10;
+}

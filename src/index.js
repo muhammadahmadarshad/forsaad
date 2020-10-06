@@ -19,16 +19,19 @@ import EmployeeRoute from './EmployeeRoute';
 import Employee from './Employee';
 function Index(props){
   let token=Cookie.getJSON('token')
-  console.log(token)
-    const [state,dispatch]= useReducer(reducer,token?{token}:{token:{token:null}})
+    const [state,dispatch]= useReducer(reducer,token?{token,msgs:[]}:{token:{token:null},msgs:[]})
     return(
     
       <AuthContext.Provider value={{state,dispatch}}>
         <BrowserRouter>
           <Switch>
           <AdminRoute path='/admin'  component={Admin}/>
-          <Route path='/login' exact component={Login}/>
           <EmployeeRoute path='/employee' component={Employee} />
+          <Route path='/login' exact component={Login}/>
+          {!token?<Redirect to='/login'/>:token.token.isAdmin?<Redirect to='/admin'></Redirect>:
+            <Redirect to = '/employee'/>
+          
+          }
           </Switch>
         </BrowserRouter>
       </AuthContext.Provider>

@@ -68,8 +68,6 @@ function PostEvent() {
       setErr(false)
     })
     .catch(err=>{
-
-      setErr(true)
       setLoading(false)
     })
 

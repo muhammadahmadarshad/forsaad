@@ -81,7 +81,7 @@ function Contracts() {
     })
     .catch(err=>{
 
-      setErr(true)
+      setState({...state,data:[]})
       setLoading(false)
     })
 

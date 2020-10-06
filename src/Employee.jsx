@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import {useMediaPredicate} from 'react-media-hook'
 import "./Styles/home.css";
-import {Layout} from 'antd'
+import {Layout,Menu} from 'antd'
 import "./Styles/home.css";
 import SidebarEmployee from "./components/SidebarEmployee";
-import { MenuFoldOutlined,MenuUnfoldOutlined } from "@ant-design/icons";
+import { MenuFoldOutlined,MenuUnfoldOutlined,PoweroffOutlined } from "@ant-design/icons";
 import AdminRoutes from "./AdminRoutes";
+import Cookie from 'js-cookie'
 import './App.css'
 import { Redirect, Route, Switch, useRouteMatch } from "react-router";
-
+import { useAuth } from "./Context/auth";
 import EmployeeDashboard from "./Pages/EmployeeDashboard";
 const {Header,Sider}=Layout
 function Employee(props) {
@@ -17,17 +18,26 @@ function Employee(props) {
   function toggleCollapsed(){
       setCollapsed(!collapsed)
   }
+  const {dispatch}=useAuth()
+  
   let {path,url}=useRouteMatch()
+  const onSignOut=()=>{
 
+    Cookie.remove('token')
+    dispatch({type:'LOGOUT'})
+
+  }
   return (
     <div className='Admin'>            
             <Layout>
                 <Header>
-                {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-                className: 'trigger btn btn-sm btn-primary',
-                onClick: toggleCollapsed,
-                style:{fontSize:'10px'}
-                })}
+                <button className= 'btn logo btn-sm btn-primary'
+              onClick= {toggleCollapsed}
+              style={{fontSize:'10px'}}>{collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>} 
+              </button>
+              <Menu theme="dark" mode="horizontal" style={{float:'right'}}>
+                <Menu.Item onClick={onSignOut} key="1"><PoweroffOutlined/></Menu.Item>
+              </Menu>
                 </Header >
 
                 <Layout style={{height:'100vh'}}  >

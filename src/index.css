@@ -3,3 +3,163 @@
 min-height: 89.8vmin;
 
 }
+
+:root {
+    --primary-bg-color: red; 
+    --secondary-bg-color: green; 
+    --tertiary-bg-color: blue;  
+}
+.flex-c{
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-r{
+    display: flex;
+    flex-direction: row;
+}
+
+.chatModule{
+    display: block;
+    position: fixed;
+    min-width: 400px;
+    background-color: #126782;
+    right: 10px;
+    bottom: 70px;
+    z-index: 2;
+    overflow: visible;
+    border-bottom-right-radius: 20px;
+    border-top-left-radius: 20px;
+}
+
+.chatBox{
+    padding: 0;
+    margin: 10px;
+    margin-bottom: 5px;
+    list-style-type: none;
+    height: 395px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: transparent;
+
+}
+
+li:last-child{
+    margin-bottom: 0 !important;
+}
+
+.textBox{
+    height: 71px;
+    padding: 2.5% 2%;
+    width: 100%;
+    background-color: #001529;
+    border-bottom-right-radius: 20px;
+}
+
+.textBox input{ 
+    height: 28px;
+    width: 100%;
+    border: none;
+    outline: none;
+    word-break: keep-all;
+    font-size: 16px;
+    resize: none;
+    color: #000000;
+}
+
+.textAreaCnt{
+    height: 50px;
+    width: 89%;
+    padding: 10px 2%;
+    background: #fff;
+}
+
+textarea::-webkit-scrollbar,
+.chatBox::-webkit-scrollbar {
+    width: 5px;
+}
+
+textarea::-webkit-scrollbar-track,
+.chatBox::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+textarea::-webkit-scrollbar-thumb,
+.chatBox::-webkit-scrollbar-thumb {
+    background: orange; 
+    border-radius: 5px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover,
+.chatBox::-webkit-scrollbar-thumb:hover {
+background:#033c58; 
+}
+
+.sender,
+.reciever{
+    width: 330px;
+    margin: 5px 10px;
+}
+
+.sender p{
+    border-bottom-right-radius: 0 !important;
+    background-color: #90E0EF;
+    color: #000000;
+}
+
+.reciever p{
+    border-bottom-left-radius: 0 !important;
+    background-color: #CAF0F8;
+    color: #000000;
+}
+
+.sender {
+    margin-left: 60px;
+}
+
+.sender p,
+.reciever p{
+    margin: 0;
+    font-size: 18px;
+    max-width: fit-content;
+    float: right;
+    word-break: keep-all;
+    padding: 5px 15px;
+    border-radius: 15px;
+}
+
+
+.sendBtn{
+    margin-left: 2%;
+    width: 12%;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    background-color: #001529;
+    padding: 10px 0;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+
+.sendIcon{
+    font-size: 18px;
+}
+
+.chatBtn{
+    position: fixed;
+    background-color: #001529;
+    color: #ffffff;
+    bottom: 6px;
+    right: 10px;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: none;
+    text-align: center;
+    outline: none !important;
+}
+
+.chatIcon{
+    font-size: 25px;
+}
